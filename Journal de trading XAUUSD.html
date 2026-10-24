@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Journal XAUUSD</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Familjen+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1f4;--sf:#fff;--ink:#16212e;--mu:#667487;--ln:#d9dfe6;--au:#a87a1f;--win:#23865c;--loss:#c0443a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a24;--sf:#1a2431;--ink:#e8edf3;--mu:#93a1b3;--ln:#2a3646;--au:#d9a94a;--win:#4cc28d;--loss:#ef7a6f;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121a24;--sf:#1a2431;--ink:#e8edf3;--mu:#93a1b3;--ln:#2a3646;--au:#d9a94a;--win:#4cc28d;--loss:#ef7a6f;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.45 "Familjen Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:640px;margin:0 auto;padding:20px 16px 48px}
+h1{font-size:2.6rem;line-height:1;margin:0;font-weight:700;letter-spacing:-.02em}
+h1 span{color:var(--au)}
+.sub{color:var(--mu);margin:4px 0 18px}
+nav{display:flex;gap:4px;border-bottom:1px solid var(--ln);margin-bottom:18px}
+nav button{flex:1;background:none;border:0;border-bottom:3px solid transparent;color:var(--mu);font:inherit;font-weight:500;padding:10px 4px;cursor:pointer}
+nav button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--au)}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:2px solid var(--au);outline-offset:2px}
+section[hidden]{display:none}
+.hero .big{font-size:3rem;font-weight:700;line-height:1;letter-spacing:-.03em}
+.hero small{color:var(--mu);display:block;margin-top:4px}
+.pos{color:var(--win)}.neg{color:var(--loss)}
+svg.eq{width:100%;height:auto;display:block;margin:14px 0 6px}
+dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:0}
+dt,dd{margin:0;padding:10px 0;border-top:1px solid var(--ln)}
+dt{color:var(--mu)}dd{text-align:right;font-weight:700}
+form{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.88rem;color:var(--mu)}
+.full{grid-column:1/-1}
+input,select,textarea{font:inherit;color:var(--ink);background:var(--sf);border:1px solid var(--ln);border-radius:6px;padding:10px;width:100%}
+textarea{min-height:80px;resize:vertical}
+.chk{flex-direction:row;align-items:center;gap:10px;color:var(--ink)}
+.chk input{width:22px;height:22px}
+.btn{font:inherit;font-weight:700;background:var(--au);color:#fff;border:0;border-radius:6px;padding:12px 16px;cursor:pointer}
+.btn.alt{background:none;color:var(--ink);border:1px solid var(--ln)}
+:root[data-theme="dark"] .btn:not(.alt){color:#16212e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn:not(.alt){color:#16212e}}
+#prev{padding:10px;border:1px dashed var(--ln);border-radius:6px;text-align:center;min-height:44px}
+.row{padding:12px 0;border-top:1px solid var(--ln);display:grid;grid-template-columns:1fr auto;gap:2px 12px}
+.row .t{font-weight:700}.row .m{color:var(--mu);font-size:.88rem}.row .n{grid-column:1/-1;font-size:.9rem;margin-top:4px}
+.row .x{background:none;border:0;color:var(--mu);font:inherit;font-size:.85rem;cursor:pointer;padding:4px 0;text-align:right}
+.empty{color:var(--mu);padding:24px 0;text-align:center}
+.scroll{overflow-x:auto}
+.cap{display:flex;gap:10px;align-items:end;margin-bottom:16px}
+.cap label{flex:1}
+h2{font-size:1.1rem;margin:26px 0 8px}
+@media (prefers-reduced-motion:no-preference){.hero .big{transition:color .2s}}
+</style>
+</head>
+<body>
+<main>
+  <h1>XAU<span>USD</span></h1>
+  <p class="sub">Journal de trading</p>
+  <nav role="tablist">
+    <button role="tab" data-tab="stats" aria-selected="true">Bilan</button>
+    <button role="tab" data-tab="add" aria-selected="false">Nouveau trade</button>
+    <button role="tab" data-tab="hist" aria-selected="false">Historique</button>
+  </nav>
+
+  <section id="stats">
+    <div class="cap">
+      <label>Capital de départ ($)<input id="cap" type="number" inputmode="decimal" min="0" step="any"></label>
+    </div>
+    <div class="hero">
+      <div class="big" id="net">0 $</div>
+      <small id="netsub">Aucun trade enregistré</small>
+      <svg class="eq" id="eq" viewBox="0 0 600 150" role="img" aria-label="Courbe de capital"></svg>
+    </div>
+    <dl id="kpi"></dl>
+    <h2>Par setup</h2>
+    <div id="bysetup" class="scroll"></div>
+  </section>
+
+  <section id="add" hidden>
+    <form id="f" autocomplete="off">
+      <label>Date<input id="date" type="date" required></label>
+      <label>Session
+        <select id="sess"><option>Asie</option><option selected>Londres</option><option>New York</option><option>Overlap Londres/NY</option></select>
+      </label>
+      <label>Sens
+        <select id="dir"><option value="buy">Achat</option><option value="sell">Vente</option></select>
+      </label>
+      <label>Biais HTF
+        <select id="htf"><option>Haussier</option><option>Baissier</option><option>Range</option></select>
+      </label>
+      <label>Entrée<input id="entry" type="number" inputmode="decimal" step="any" required></label>
+      <label>Stop loss<input id="sl" type="number" inputmode="decimal" step="any" required></label>
+      <label>Take profit<input id="tp" type="number" inputmode="decimal" step="any"></label>
+      <label>Sortie réelle<input id="exit" type="number" inputmode="decimal" step="any" required></label>
+      <label>Lots<input id="lots" type="number" inputmode="decimal" step="any" min="0" value="0.01" required></label>
+      <label>Frais ($)<input id="fees" type="number" inputmode="decimal" step="any" value="0"></label>
+      <label class="full">Setup SMC
+        <select id="setup"><option>Order Block</option><option>FVG / Imbalance</option><option>Sweep de liquidité</option><option>BOS / CHoCH</option><option>Fibonacci OTE</option><option>Autre</option></select>
+      </label>
+      <label class="chk full"><input id="plan" type="checkbox" checked> J’ai respecté mon plan de trading</label>
+      <label class="full">Notes (émotions, erreurs, leçon)<textarea id="note"></textarea></label>
+      <div id="prev" class="full">Renseigne l’entrée, le SL et la sortie pour voir le résultat.</div>
+      <button class="btn full" type="submit">Enregistrer le trade</button>
+    </form>
+  </section>
+
+  <section id="hist" hidden>
+    <div id="list"></div>
+    <h2>Sauvegarde</h2>
+    <p class="sub" style="margin-top:0">Les données restent dans ce navigateur. Copie la sauvegarde pour la conserver ou la transférer sur un autre appareil.</p>
+    <textarea id="bk" aria-label="Sauvegarde JSON"></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px">
+      <button class="btn alt" id="exp" type="button">Exporter</button>
+      <button class="btn alt" id="imp" type="button">Importer</button>
+    </div>
+    <p id="msg" class="sub"></p>
+  </section>
+</main>
+
+<script>
+(function(){
+var K='xauusd-journal-v1';
+var S={cap:1000,trades:[]};
+try{var r=localStorage.getItem(K);if(r){var p=JSON.parse(r);if(p&&Array.isArray(p.trades))S=p;}}catch(e){}
+function save(){try{localStorage.setItem(K,JSON.stringify(S));}catch(e){}}
+var $=function(i){return document.getElementById(i)};
+var nf=function(v,d){return Number(v).toLocaleString('fr-FR',{minimumFractionDigits:d,maximumFractionDigits:d})};
+var sg=function(v,d,u){return (v>0?'+':'')+nf(v,d)+(u||'')};
+var cls=function(v){return v>0?'pos':v<0?'neg':''};
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+/* Or : 1 lot = 100 oz, 1 pip = 0,10 $ de variation de prix */
+function calc(t){
+  var d=t.dir==='buy'?1:-1, diff=(t.exit-t.entry)*d, risk=Math.abs(t.entry-t.sl);
+  return {pips:diff*10,pnl:diff*100*t.lots-(t.fees||0),r:risk>0?diff/risk:0};
+}
+function sorted(){return S.trades.slice().sort(function(a,b){return a.date<b.date?-1:a.date>b.date?1:a.id-b.id})}
+
+function render(){
+  $('cap').value=S.cap;
+  var ts=sorted().map(function(t){var c=calc(t);return Object.assign({},t,c)});
+  var n=ts.length,tot=0,gw=0,gl=0,w=0,sr=0,pc=0,eq=[+S.cap||0],peak=eq[0],dd=0;
+  ts.forEach(function(t){tot+=t.pnl;if(t.pnl>0){w++;gw+=t.pnl}else gl+=t.pnl;sr+=t.r;if(t.plan)pc++;
+    var e=eq[eq.length-1]+t.pnl;eq.push(e);if(e>peak)peak=e;if(peak-e>dd)dd=peak-e;});
+  var net=$('net');net.textContent=sg(tot,2,' $');net.className='big '+cls(tot);
+  $('netsub').textContent=n?(nf(((+S.cap||0)?tot/S.cap*100:0),2)+' % du capital · '+n+' trade'+(n>1?'s':'')):'Aucun trade enregistré';
+  drawEq(eq);
+  var best=n?Math.max.apply(null,ts.map(function(t){return t.pnl})):0, worst=n?Math.min.apply(null,ts.map(function(t){return t.pnl})):0;
+  var rows=[
+    ['Taux de réussite',n?nf(w/n*100,1)+' %':'–'],
+    ['Profit factor',n?(gl<0?nf(gw/-gl,2):(gw>0?'∞':'–')):'–'],
+    ['Espérance (R par trade)',n?sg(sr/n,2,' R'):'–'],
+    ['Total en R',n?sg(sr,2,' R'):'–'],
+    ['Gain moyen / perte moyenne',n?(w?nf(gw/w,2):'0')+' $ / '+(n-w?nf(gl/(n-w),2):'0')+' $':'–'],
+    ['Meilleur / pire trade',n?sg(best,2,' $')+' / '+sg(worst,2,' $'):'–'],
+    ['Drawdown maximal',n?nf(dd,2)+' $':'–'],
+    ['Respect du plan',n?nf(pc/n*100,0)+' %':'–']
+  ];
+  $('kpi').innerHTML=rows.map(function(x){return '<dt>'+x[0]+'</dt><dd>'+x[1]+'</dd>'}).join('');
+  var g={};ts.forEach(function(t){var o=g[t.setup]||(g[t.setup]={n:0,w:0,r:0,p:0});o.n++;if(t.pnl>0)o.w++;o.r+=t.r;o.p+=t.pnl});
+  var ks=Object.keys(g);
+  $('bysetup').innerHTML=ks.length?'<dl>'+ks.map(function(k){var o=g[k];return '<dt>'+esc(k)+'<br><small>'+o.n+' trade'+(o.n>1?'s':'')+' · '+nf(o.w/o.n*100,0)+' % gagnants</small></dt><dd class="'+cls(o.p)+'">'+sg(o.p,2,' $')+'<br><small>'+sg(o.r,2,' R')+'</small></dd>'}).join('')+'</dl>':'<p class="empty">Les stats par setup apparaîtront après ton premier trade.</p>';
+  var L=ts.slice().reverse();
+  $('list').innerHTML=L.length?L.map(function(t){
+    return '<div class="row"><div class="t">'+esc(t.date)+' · '+(t.dir==='buy'?'Achat':'Vente')+' '+nf(t.lots,2)+' lot</div>'
+    +'<div class="t '+cls(t.pnl)+'">'+sg(t.pnl,2,' $')+'</div>'
+    +'<div class="m">'+esc(t.setup)+' · '+esc(t.sess)+' · HTF '+esc(t.htf).toLowerCase()+(t.plan?'':' · hors plan')+'</div>'
+    +'<div class="m" style="text-align:right">'+sg(t.r,2,' R')+' · '+sg(t.pips,1,' pips')+'</div>'
+    +(t.note?'<div class="n">'+esc(t.note)+'</div>':'')
+    +'<button class="x" data-del="'+t.id+'" type="button">Supprimer</button></div>';
+  }).join(''):'<p class="empty">Aucun trade pour l’instant. Ajoute le premier dans l’onglet « Nouveau trade ».</p>';
+}
+
+function drawEq(eq){
+  var s=$('eq');
+  if(eq.length<2){s.innerHTML='<line x1="0" y1="75" x2="600" y2="75" stroke="var(--ln)" stroke-dasharray="4 6"/>';return;}
+  var mn=Math.min.apply(null,eq),mx=Math.max.apply(null,eq),sp=(mx-mn)||1,pts=eq.map(function(v,i){return (i/(eq.length-1)*580+10).toFixed(1)+','+(135-(v-mn)/sp*120).toFixed(1)});
+  var base=(135-((eq[0]-mn)/sp)*120).toFixed(1);
+  s.innerHTML='<line x1="0" y1="'+base+'" x2="600" y2="'+base+'" stroke="var(--ln)" stroke-dasharray="4 6"/>'
+   +'<polyline points="'+pts.join(' ')+'" fill="none" stroke="var(--au)" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>'
+   +'<circle cx="'+pts[pts.length-1].split(',')[0]+'" cy="'+pts[pts.length-1].split(',')[1]+'" r="5" fill="var(--au)"/>';
+}
+
+/* onglets */
+document.querySelector('nav').addEventListener('click',function(e){
+  var b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('nav button').forEach(function(x){x.setAttribute('aria-selected',x===b)});
+  ['stats','add','hist'].forEach(function(id){$(id).hidden=id!==b.dataset.tab});
+});
+
+$('cap').addEventListener('change',function(){S.cap=parseFloat(this.value)||0;save();render()});
+
+function val(i){return parseFloat($(i).value)}
+function preview(){
+  var t={dir:$('dir').value,entry:val('entry'),sl:val('sl'),exit:val('exit'),lots:val('lots')||0,fees:val('fees')||0};
+  if([t.entry,t.sl,t.exit].some(isNaN)){$('prev').textContent='Renseigne l’entrée, le SL et la sortie pour voir le résultat.';return;}
+  var c=calc(t);
+  $('prev').innerHTML='<b class="'+cls(c.pnl)+'">'+sg(c.r,2,' R')+' · '+sg(c.pnl,2,' $')+' · '+sg(c.pips,1,' pips')+'</b>';
+}
+$('f').addEventListener('input',preview);
+$('date').value=new Date().toISOString().slice(0,10);
+
+$('f').addEventListener('submit',function(e){
+  e.preventDefault();
+  S.trades.push({id:Date.now(),date:$('date').value,sess:$('sess').value,dir:$('dir').value,htf:$('htf').value,
+    entry:val('entry'),sl:val('sl'),tp:isNaN(val('tp'))?null:val('tp'),exit:val('exit'),lots:val('lots'),fees:val('fees')||0,
+    setup:$('setup').value,plan:$('plan').checked,note:$('note').value.trim()});
+  save();
+  ['entry','sl','tp','exit','note'].forEach(function(i){$(i).value=''});
+  $('plan').checked=true;preview();render();
+  document.querySelector('[data-tab="hist"]').click();
+});
+
+/* suppression en deux touches */
+$('list').addEventListener('click',function(e){
+  var b=e.target.closest('[data-del]');if(!b)return;
+  if(b.dataset.armed!=='1'){b.dataset.armed='1';b.textContent='Confirmer la suppression';b.style.color='var(--loss)';return;}
+  S.trades=S.trades.filter(function(t){return String(t.id)!==b.dataset.del});save();render();
+});
+
+$('exp').addEventListener('click',function(){$('bk').value=JSON.stringify(S);$('bk').select();$('msg').textContent='Sauvegarde générée. Copie le texte ci-dessus.'});
+$('imp').addEventListener('click',function(){
+  try{var p=JSON.parse($('bk').value);if(!p||!Array.isArray(p.trades))throw 0;S={cap:+p.cap||0,trades:p.trades};save();render();$('msg').textContent='Import réussi : '+S.trades.length+' trade(s).';}
+  catch(x){$('msg').textContent='Import impossible : colle d’abord une sauvegarde exportée depuis ce journal.'}
+});
+
+render();preview();
+})();
+</script>
+</body>
+</html>
